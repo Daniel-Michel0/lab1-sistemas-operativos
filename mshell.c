@@ -16,15 +16,14 @@
 	-Se supone que usar printf en un manejador de señales es mala practica y deberia cambiarse
 
 	Cosas que estan listas:
-	-parte 1 1,2 (hay que cambiar el malloc para que se use de acuerdo a la cantidad de entradas que hay, se podria ver los " " (espacios) 
-	 y reservar memoria de acuerdo a eso), 3, 4, 5 (no he probado extensamente), 6 , 7
+	-parte 1 1, 2, 3, 4, 5 (no he probado extensamente), 6 , 7
 	-parte 2 2
 */
 
 
-char **getInput(char *input){
-	char **comando = malloc(8 * sizeof(char*));				// Alocamos memoria (deberia ser muy grande, cambiar el 8)
-	char *aux;												// para cumplir la parte a) 2)
+char **getInput(char *input, int n){
+	char **comando = malloc((n+1) * sizeof(char*));			// Alocamos memoria
+	char *aux;
 	int indice = 0;
 
 	aux = strtok(input," ");								
@@ -45,6 +44,16 @@ void ctrlc(){
 	if(aux == 'x' || aux == 'X') exit(0);
 }
 
+int cuentaPalabras(char *input){
+	int i = 0;
+	int palabras = 1;
+	while(input[i] != '\0'){															// Si encontramos fin del string paramos de contar
+		if(input[i] == ' ' || input[i] == '\n' || input[i] == '\t') palabras++;			// Consideramos una nueva palabra si hay un espacio, salto de linea o tab entre caracteres
+		i++;
+	}
+	return palabras;
+}
+
 int main(){
 	char **comando;
 	char *input;
@@ -55,7 +64,7 @@ int main(){
 
 	while(1){
 		input = readline("bencinera :) ");					// funny joke
-		comando = getInput(input);							// Obtenemos el input
+		comando = getInput(input, cuentaPalabras(input));							// Obtenemos el input
 		if(comando[0] != NULL){								// Evita segmentation fault de strcmp
 			if(strcmp(comando[0], "exit") == 0){
 				exit(0);
