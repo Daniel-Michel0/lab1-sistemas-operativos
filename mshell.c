@@ -8,15 +8,17 @@
 
 /*
 	Cosas que arreglar:
-	*arreglado creo, falta probar más*-Hay que evitar el segmentation fault al solamente usar \n
+	*arreglado*-Hay que evitar el segmentation fault al solamente usar \n
 	 esto *probablemente* se debe al strcmp del exit, pero son las 2 am y mi cerebro no da para pensar la solucion xd
-	-Exit no funciona siempre, ni idea porque
-	-El manejador de ctrlc bugea feo el terminal tras usar ctrlc despues de algun comando no valido
+	*arreglado*-Exit no funciona siempre, ni idea porque
+	*arreglado*-El manejador de ctrlc bugea feo el terminal tras usar ctrlc despues de algun comando no valido
+	-El manejador de ctrlc a veces se bugea teniendo que ser usado 2 veces
+	-Se supone que usar printf en un manejador de señales es mala practica y deberia cambiarse
 
 	Cosas que estan listas:
 	-parte 1 1,2 (hay que cambiar el malloc para que se use de acuerdo a la cantidad de entradas que hay, se podria ver los " " (espacios) 
-	 y reservar memoria de acuerdo a eso), 3, 4, 5 (no he probado extensamente), 6 (tiene error especificado en errores), 7
-	-parte 2 nada
+	 y reservar memoria de acuerdo a eso), 3, 4, 5 (no he probado extensamente), 6 , 7
+	-parte 2 2
 */
 
 
@@ -37,10 +39,10 @@ char **getInput(char *input){
 }
 
 void ctrlc(){
-	char *aux;
-	aux = readline(" Presione x para salir del programa, presione otra tecla para continuar.\n");
-	if(aux = "x") exit(0);
-	return;
+	char aux;
+	printf("Presione x si desea cerrar la aplicacion\n");
+	aux = getchar();
+	if(aux == 'x' || aux == 'X') exit(0);
 }
 
 int main(){
@@ -65,7 +67,9 @@ int main(){
 			perror("error de fork.");
 		}else if(child_pid == 0){
 			if(execvp(comando[0],comando) == -1){
-				perror(comando[0]);
+				// perror(comando[0]);
+				printf("%s no es un comando o archivo valido.\n", comando[0]);
+				kill(getpid(), SIGKILL);
 			}
 		}else{
 			waitpid(child_pid, &stat_loc, WUNTRACED);
